@@ -103,3 +103,7 @@ body {
 h1 {
   letter-spacing: -0.02em;
 }
+
+.grecaptcha-badge{
+  display: none;
+}

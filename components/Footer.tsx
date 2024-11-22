@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Instagram, Linkedin, Youtube, X } from 'lucide-react';
+import { Mail, Phone, MapPin, Instagram, Linkedin, Youtube } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -42,7 +42,7 @@ export function Footer() {
                 <Linkedin className="w-6 h-6" />
               </a>
 
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FF0000] transition-colors">
+              <a href="https://youtube.com/@puerto7112" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FF0000] transition-colors">
                 <Youtube className="w-6 h-6" />
               </a>
             </div>

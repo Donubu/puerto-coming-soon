@@ -12,7 +12,7 @@ import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 const contactSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   email: z.string().email('Email inválido'),
-  phone: z.string().min(15, 'Teléfono inválido'),
+  phone: z.string().min(9, 'Teléfono inválido'),
   message: z.string().min(10, 'El mensaje debe tener al menos 10 caracteres'),
 });
 
@@ -23,10 +23,11 @@ export function ContactForm() {
   const phoneInputRef = useRef<HTMLInputElement>(null);
   const maskRef = useRef<InputMask<FactoryArg> | null>(null);
   const { executeRecaptcha } = useGoogleReCaptcha();
-  
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
     reset
   } = useForm<ContactFormData>({
@@ -43,33 +44,22 @@ export function ContactForm() {
     if (phoneInputRef.current) {
       maskRef.current = IMask(phoneInputRef.current, {
         mask: '+56 0 0000 0000',
+        lazy: false,
         definitions: {
           '0': /[0-9]/
-        },
-        lazy: true,
-        prepare: (str: string) => {
-          if (str === '') return '';
-          return str;
         }
       });
 
-      phoneInputRef.current.addEventListener('focus', () => {
-        if (phoneInputRef.current?.value === '') {
-          phoneInputRef.current.value = '+56 ';
-        }
-      });
-
-      phoneInputRef.current.addEventListener('blur', () => {
-        if (phoneInputRef.current?.value === '+56 ') {
-          phoneInputRef.current.value = '';
-        }
+      // Update form value when mask changes
+      maskRef.current.on('accept', () => {
+        setValue('phone', maskRef.current?.unmaskedValue || '', { shouldValidate: true });
       });
     }
 
     return () => {
       maskRef.current?.destroy();
     };
-  }, []);
+  }, [setValue]);
 
   const onSubmit = async (data: ContactFormData) => {
     if (!executeRecaptcha) {
@@ -80,7 +70,7 @@ export function ContactForm() {
     setIsSubmitting(true);
     try {
       const token = await executeRecaptcha('contact_form');
-      
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
@@ -99,7 +89,7 @@ export function ContactForm() {
 
       toast.success('Mensaje enviado correctamente');
       reset();
-      
+
       if (phoneInputRef.current) {
         phoneInputRef.current.value = '';
       }
@@ -115,71 +105,69 @@ export function ContactForm() {
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <input
-            {...register('name')}
-            placeholder="Nombre completo"
-            className="w-full px-4 py-2 text-sm rounded-md bg-black/80 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-transparent backdrop-blur-sm transition-all"
-          />
-          {errors.name && (
-            <p className="mt-1 text-[10px] text-[#ff4444]">{errors.name.message}</p>
-          )}
-        </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <input
+          {...register('name')}
+          placeholder="Nombre completo"
+          className="w-full px-4 py-2 text-sm rounded-md bg-black/80 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-transparent backdrop-blur-sm transition-all"
+        />
+        {errors.name && (
+          <p className="mt-1 text-[10px] text-[#ff4444]">{errors.name.message}</p>
+        )}
+      </div>
 
-        <div>
-          <input
-            {...register('email')}
-            type="email"
-            placeholder="Email"
-            className="w-full px-4 py-2 text-sm rounded-md bg-black/80 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-transparent backdrop-blur-sm transition-all"
-          />
-          {errors.email && (
-            <p className="mt-1 text-[10px] text-[#ff4444]">{errors.email.message}</p>
-          )}
-        </div>
+      <div>
+        <input
+          {...register('email')}
+          type="email"
+          placeholder="Email"
+          className="w-full px-4 py-2 text-sm rounded-md bg-black/80 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-transparent backdrop-blur-sm transition-all"
+        />
+        {errors.email && (
+          <p className="mt-1 text-[10px] text-[#ff4444]">{errors.email.message}</p>
+        )}
+      </div>
 
-        <div>
-          <input
-            {...register('phone')}
-            ref={phoneInputRef}
-            type="tel"
-            placeholder="Teléfono"
-            className="w-full px-4 py-2 text-sm rounded-md bg-black/80 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-transparent backdrop-blur-sm transition-all"
-          />
-          {errors.phone && (
-            <p className="mt-1 text-[10px] text-[#ff4444]">{errors.phone.message}</p>
-          )}
-        </div>
+      <div>
+        <input
+          {...register('phone')}
+          ref={phoneInputRef}
+          type="tel"
+          placeholder="Teléfono"
+          className="w-full px-4 py-2 text-sm rounded-md bg-black/80 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-transparent backdrop-blur-sm transition-all"
+        />
+        {errors.phone && (
+          <p className="mt-1 text-[10px] text-[#ff4444]">{errors.phone.message}</p>
+        )}
+      </div>
 
-        <div>
-          <textarea
-            {...register('message')}
-            placeholder="Mensaje"
-            rows={3}
-            className="w-full px-4 py-2 text-sm rounded-md bg-black/80 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-transparent backdrop-blur-sm transition-all resize-none"
-          />
-          {errors.message && (
-            <p className="mt-1 text-[10px] text-[#ff4444]">{errors.message.message}</p>
-          )}
-        </div>
+      <div>
+        <textarea
+          {...register('message')}
+          placeholder="Mensaje"
+          rows={3}
+          className="w-full px-4 py-2 text-sm rounded-md bg-black/80 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-transparent backdrop-blur-sm transition-all resize-none"
+        />
+        {errors.message && (
+          <p className="mt-1 text-[10px] text-[#ff4444]">{errors.message.message}</p>
+        )}
+      </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="relative w-full px-4 py-2 text-sm font-medium text-white bg-black/90 rounded-md focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all backdrop-blur-sm overflow-hidden group"
-        >
-          <span className="relative z-10">
-            {isSubmitting ? (
-              <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-            ) : (
-              'Enviar mensaje'
-            )}
-          </span>
-          <div className="absolute inset-0 w-0 bg-red-600 transition-all duration-300 ease-out group-hover:w-full" />
-        </button>
-      </form>
-    </>
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="relative w-full px-4 py-2 text-sm font-medium text-white bg-black/90 rounded-md focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all backdrop-blur-sm overflow-hidden group"
+      >
+        <span className="relative z-10">
+          {isSubmitting ? (
+            <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+          ) : (
+            'Enviar mensaje'
+          )}
+        </span>
+        <div className="absolute inset-0 w-0 bg-red-600 transition-all duration-300 ease-out group-hover:w-full" />
+      </button>
+    </form>
   );
 }

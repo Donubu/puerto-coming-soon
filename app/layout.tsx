@@ -3,6 +3,7 @@ import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { MouseFollower } from '@/components/MouseFollower';
 import { Providers } from '@/components/Providers';
+import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 
 const montserrat = Montserrat({ subsets: ['latin'] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
           <div>{children}</div>
           <MouseFollower />
         </Providers>
+        <GoogleAnalytics />
       </body>
     </html>
   );

@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { ContactForm } from '@/components/ContactForm';
+import { ContactModal } from '@/components/ContactModal';
 import { Toaster } from 'sonner';
 import Image from 'next/image';
 
@@ -37,17 +37,16 @@ export default function Home() {
                 Agencia de publicidad Puerto
               </h1>
 
-               <Image 
-                  src="https://static.puer.to/sitio-2025/logo-blanco.png" 
-                  alt="Logo Agencia Puerto" 
-                  width="320" 
-                  height="78"
-                  className="h-16 w-auto"
-                />
+              <Image 
+                src="https://static.puer.to/sitio-2025/logo-blanco.png" 
+                alt="Logo Agencia Puerto" 
+                width="320" 
+                height="78"
+                className="h-16 w-auto"
+              />
               
-              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
-                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-white/90 text-lg font-medium">Work in progress</span>
+              <div className="mt-6">
+                <ContactModal />
               </div>
             </div>
           </div>
