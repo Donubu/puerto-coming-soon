@@ -5,10 +5,6 @@ import Script from 'next/script';
 export function GoogleAnalytics() {
   const gaId = process.env.NEXT_PUBLIC_GA4_ID;
 
-  if (!gaId) {
-    return null;
-  }
-
   return (
     <>
       <Script
